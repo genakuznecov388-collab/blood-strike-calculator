@@ -5,7 +5,16 @@ let operator = null;
 let shouldResetDisplay = false;
 
 function updateDisplay() {
-    display.value = currentInput;
+    if (operator !== null && !shouldResetDisplay) {
+        // Показываем полное выражение: 2+2
+        display.value = previousInput + ' ' + operator + ' ' + currentInput;
+    } else if (operator !== null && shouldResetDisplay) {
+        // После нажатия оператора
+        display.value = previousInput + ' ' + operator;
+    } else {
+        // Обычный ввод
+        display.value = currentInput;
+    }
 }
 
 function appendNumber(num) {
@@ -31,6 +40,7 @@ function appendOperator(op) {
     previousInput = currentInput;
     operator = op;
     shouldResetDisplay = true;
+    updateDisplay();
 }
 
 function calculate() {
@@ -54,8 +64,11 @@ function calculate() {
             break;
         case '/':
             if (current === 0) {
-                currentInput = 'ERROR';
-                updateDisplay();
+                display.value = 'ERROR: Division by Zero';
+                currentInput = '0';
+                previousInput = '';
+                operator = null;
+                shouldResetDisplay = false;
                 return;
             }
             result = prev / current;
@@ -65,6 +78,7 @@ function calculate() {
     }
     
     currentInput = parseFloat(result.toFixed(10)).toString();
+    previousInput = '';
     operator = null;
     shouldResetDisplay = true;
     updateDisplay();
